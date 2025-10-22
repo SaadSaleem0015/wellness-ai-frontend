@@ -1,0 +1,38 @@
+@keyframes box-fill {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+    25% {
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+.box {
+    width: 48px; /* Adjust based on your design */
+    height: 48px; /* Adjust based on your design */
+    background-color: rgba(39, 94, 254, 1); /* You can replace with your primary color */
+    border-radius: 8px; /* Rounded corners */
+    opacity: 0; /* Start invisible */
+    animation: box-fill 1s forwards; /* Apply the animation */
+}
+
+.box:nth-child(1) {
+    animation-delay: 0s; /* No delay for the first box */
+}
+
+.box:nth-child(2) {
+    animation-delay: 0.2s; /* Delay for the second box */
+}
+
+.box:nth-child(3) {
+    animation-delay: 0.4s; /* Delay for the third box */
+}
+
+.box:nth-child(4) {
+    animation-delay: 0.6s; /* Delay for the fourth box */
+}
+

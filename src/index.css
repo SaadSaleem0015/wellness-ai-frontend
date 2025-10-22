@@ -1,0 +1,129 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.spaned-check:not(:checked)~.spanned-check-tick {
+  display: none;
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-blink {
+  animation: blink 1.5s infinite;
+}
+
+.interface-container .interface-grid {
+  background: white !important;
+  color: rgb(45, 45, 45);
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #afafaf #f1f1f1;
+  overflow: auto;
+}
+
+
+.react-calendar__tile--range {
+  background: none !important;
+  color:black !important
+}
+.react-calendar__tile--hasActive {
+  background-color: #f4f4f4 !important;  
+  color: rgb(0, 0, 0) !important;    
+  background: white !important;          
+}
+
+.react-calendar__tile--active:hover {
+  background-color: #f0f0f0 !important;  
+}
+.selected-date {
+  background-color: #0069d9 !important; 
+  color: white !important; 
+  border-radius: 50%;  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.react-calendar__month-view__days__day--weekend {
+  color: rgb(0, 0, 0) !important;
+}
+
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; 
+}
+.no-scrollbar {
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
+}
+
+@keyframes voice-line {
+  0%, 100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+.voice-line {
+  animation: voice-line 1s ease-in-out infinite;
+}
+
+@keyframes fade-in-out {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.fade-in-out {
+  animation: fade-in-out 2s ease-in-out forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+ .custom-scrollbar {
+   scrollbar-width: thin;
+   scrollbar-color: #c7d2fe #f1f5f9;
+ }
+ .custom-scrollbar::-webkit-scrollbar {
+   width: 6px;
+ }
+ .custom-scrollbar::-webkit-scrollbar-track {
+   background: #f1f5f9;
+ }
+ .custom-scrollbar::-webkit-scrollbar-thumb {
+   background-color: #c7d2fe;
+   border-radius: 20px;
+ }
+
+ 
