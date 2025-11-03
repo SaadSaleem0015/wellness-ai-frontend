@@ -9,8 +9,7 @@ import { filterAndPaginate } from "../Helpers/filterAndPaginate";
 import { PageNumbers } from "../Components/PageNumbers";
 import { useSearchParams } from "react-router-dom";
 import LeadModal from "../Components/LeadModal";
-import { FcCalendar, FcPhone } from "react-icons/fc";
-import { AddLeadModal } from "../Components/AddLeadModal";
+import { FcCalendar } from "react-icons/fc";
 import 'react-datepicker/dist/react-datepicker.css';
 import { CiFilter } from "react-icons/ci";
 import DatePicker from "react-datepicker";
@@ -45,11 +44,6 @@ interface CustomLead extends Record<string, unknown> {
   status: boolean;
 }
 
-interface Assistant {
-  id: string;
-  name: string;
-  vapi_assistant_id: string;
-}
 
 type ModalLead = {
   first_name?: string;
@@ -74,17 +68,12 @@ export function Leads() {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [assistants, setAssistants] = useState<Assistant[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedLead, setSelectedLead] = useState<ModalLead | null>(null);
-  const [selectedAssistant, setSelectedAssistant] = useState<string | null>(null);
-  const [isAddLeadModalOpen, setIsAddLeadModalOpen] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [editingLead, setEditingLead] = useState<Lead | null>(null);
   const [editStateModalVisible, setEditStateModalVisible] = useState(false);
   const [newStateValue, setNewStateValue] = useState('');
-  const [selectedLeadId, setSelectedLeadId] = useState<number | null>(null);
 
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
@@ -94,8 +83,6 @@ export function Leads() {
   const[tempSalesforceId,setTempSalesforceId] = useState('')
   const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
   const [leadIdsToDelete, setLeadIdsToDelete] = useState<number[]>([]);
-  const [leadToAddDnc, setLeadToAddDnc] = useState<number | null>(null);
-  const [dncConfirmationModalVisible, setDncConfirmationModalVisible] = useState<boolean>(false);
 
   const fileId = searchParams.get("file_id");
   const isCustom = !!fileId;
@@ -108,7 +95,6 @@ export function Leads() {
   }, [leads, customLeads, search, currentPage, startDate, endDate, salesforceId, isCustom]); 
 
   useEffect(() => {
-    fetchAssistants();
     fetchLeads(); 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -138,14 +124,6 @@ export function Leads() {
     setLoading(false);
   };
 
-  const fetchAssistants = async () => {
-    try {
-      const response = await backendRequest<Assistant[]>('GET', '/get-user-assistants');
-      setAssistants(Array.isArray(response) ? response : []);
-    } catch (error) {
-      console.error('Error fetching assistants:', error);
-    }
-  };
 
   const handleFilterApply = () => {
     setSalesforceId(tempSalesforceId)
@@ -162,32 +140,7 @@ export function Leads() {
       setLeads(oldLeads => oldLeads.filter(lead => !leadIds.includes(lead.id)));
   };
 
-  const handleConfirmAddLeadToDNC = async () =>{
-    const leadId = leadToAddDnc
-    try {
-      const res = await backendRequest("POST", `/add-lead-todnc/${leadId}`)
-      notifyResponse(res)
-      setDncConfirmationModalVisible(false) 
-      setLeadToAddDnc(null)
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
-  const handleCall = async () => {
-    setLoading(true)
-    if (selectedLeadId && selectedAssistant) {
-      try {
-        const response = await backendRequest("POST", `/assistant-call/${selectedAssistant}/${selectedLeadId}`);
-        notifyResponse(response);
-        setModalVisible(false);
-      } catch (error) {
-        console.error("Failed to Call:", error);
-      } finally {
-        setLoading(false)
-      }
-    }
-  };
 
   const handleModal = (lead: Lead | CustomLead) => {
     const modalLead: ModalLead = ("first_name" in lead)
@@ -217,54 +170,19 @@ export function Leads() {
     setSelectedLead(null);
   };
 
-  const handleCallModal = (lead: Lead) => {
-    setSelectedLeadId(lead.id);
-    setModalVisible(true);
-  };
 
-  const handleCloseAssitantModal = () => {
-    setModalVisible(false);
-    setSelectedAssistant(null);
-    setSelectedLeadId(null);
-  };
-
-  const handleAddLeadModalOpen = () => {
-    setIsAddLeadModalOpen(true);
-  };
-
-  const handleAddLeadModalClose = () => {
-    setIsAddLeadModalOpen(false);
-  };
 
   const handleDeleteConfirmation = (leadIds: number[]) => {
     setLeadIdsToDelete(leadIds);
     setConfirmationModalVisible(true);
   };
 
-  const handleAddLeadToDNC = (leadId: number) => {
-    setLeadToAddDnc(leadId)
-    setDncConfirmationModalVisible(true)
-  }
 
   const handleConfirmDelete = async () => {
     await remove(leadIdsToDelete);
     setConfirmationModalVisible(false);
   };
   
-  const handleAddLead = async (lead: { first_name: string; last_name: string; email: string; mobile: string; startDate: string; salesforce_id: string }) => {
-    const fileId = searchParams.get("file_id");
-    const leadData = {
-      ...lead,
-      add_date: lead.startDate,
-      file_id: fileId ? Number(fileId) : null
-    };
-
-    const response = await backendRequest("POST", "/add_manually_lead", leadData);
-    notifyResponse(response);
-    if (response.success) {
-      await fetchLeads();
-    }
-  };
 
   const handleResetFilters = () => {
     setTempEndDate(undefined)
@@ -328,21 +246,6 @@ export function Leads() {
               <span>Filter Search</span>
             </button>
           </div>
-          {!isCustom && (
-            <div className="flex flex-col sm:flex-row sm:justify-start items-center w-full sm:w-auto gap-2">
-              <button
-                onClick={handleAddLeadModalOpen}
-                className="w-full sm:w-auto bg-primary hover:bg-hoverdPrimary text-white font-semibold text-sm lg:text-lg px-6 py-2 sm:py-3 rounded-lg shadow-md transition-all duration-300 ease-in-out sm:ml-2"
-              >
-                Add
-              </button>
-              <AddLeadModal
-                isOpen={isAddLeadModalOpen}
-                onClose={handleAddLeadModalClose}
-                onSubmit={handleAddLead}
-              />
-            </div>
-          )}
         </div>
 
         <div className="overflow-auto mb-6">
@@ -367,7 +270,6 @@ export function Leads() {
                     <th className="p-4 align-middle whitespace-nowrap">Start Date</th>
                     <th className="p-4 align-middle">Mobile</th>
                     <th className="p-4 align-middle">State</th>
-                    <th className="py-4 px-6 align-middle whitespace-nowrap">Add to DNC</th>
                     <th></th>
                   </>
                 )}
@@ -414,22 +316,23 @@ export function Leads() {
                           (lead as Lead).state
                         )}
                       </td>
-                      <td className="p-4 align-middle"> 
-                        <button 
-                          onClick={() => handleAddLeadToDNC((lead as Lead).id)} 
-                          className="text-white bg-primary p-2 rounded-md"
-                        >
-                          Add
-                        </button>
-                      </td>
                       <td className="align-middle text-end">
-                        <button onClick={() => handleCallModal(lead as Lead)} className="text-green-800 xl:mr-2 hover:underline" aria-placeholder="CALL"> <FcPhone /> </button>
-                        <button className="xl:mr-2" onClick={() => handleModal(lead as Lead)}>
-                          <TbEye />
-                        </button>
-                        <button className="text-red-600" onClick={() => handleDeleteConfirmation([(lead as Lead).id])}>
-                          <TbTrash />
-                        </button>
+                        <div className="flex items-center gap-2 justify-end">
+                          <button 
+                            className="text-blue-600 hover:text-blue-800 transition-colors" 
+                            onClick={() => handleModal(lead as Lead)}
+                            aria-label="View Lead"
+                          >
+                            <TbEye className="w-5 h-5" />
+                          </button>
+                          <button 
+                            className="text-red-600 hover:text-red-800 transition-colors" 
+                            onClick={() => handleDeleteConfirmation([(lead as Lead).id])}
+                            aria-label="Delete Lead"
+                          >
+                            <TbTrash className="w-5 h-5" />
+                          </button>
+                        </div>
                       </td>
                     </>
                   )}
@@ -477,52 +380,6 @@ export function Leads() {
             </div>
           )}
 
-          {/* Other modals... */}
-          {modalVisible && (
-            <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center px-2 z-50">
-              <div className="bg-white p-3 sm:p-4 md:p-10 rounded-lg shadow-lg max-w-xl w-full">
-                <h2 className="text-2xl font-semibold mb-6 text-gray-800">Select Assistant</h2>
-                <div className="flex flex-col space-y-6">
-                  <div className="flex flex-col">
-                    <label htmlFor="assistantSelect" className="mb-2 text-gray-600 font-medium">
-                      Select an Assistant
-                    </label>
-                    <select
-                      id="assistantSelect"
-                      className="p-3 border border-gray-300 rounded-lg text-gray-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                      value={selectedAssistant || ''}
-                      onChange={(e) => setSelectedAssistant(e.target.value)}
-                    >
-                      <option value="" disabled>
-                        Choose an assistant...
-                      </option>
-                      {assistants.map((assistant) => (
-                        <option key={assistant.id} value={assistant.vapi_assistant_id}>
-                          {assistant.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex items-center space-x-4">
-                    <button
-                      className="px-7 py-2 bg-primary text-white rounded hover:bg-primary-dark transition duration-200"
-                      onClick={handleCall}
-                      disabled={!selectedAssistant || loading}
-                    >
-                      {loading ? "Calling..." : 'Call'}
-                    </button>
-                    <button
-                      className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition duration-200"
-                      onClick={handleCloseAssitantModal}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
 
           {filterModalVisible && (
             <div className="fixed inset-0 bg-gray-900 bg-opacity-60 flex justify-center items-center z-50">
@@ -593,14 +450,6 @@ export function Leads() {
             onClose={() => setConfirmationModalVisible(false)}
             onConfirm={handleConfirmDelete}
             message="Are you sure you want to delete this lead? This action cannot be undone."
-          />
-        )}
-        {dncConfirmationModalVisible && (
-          <ConfirmationModal
-            show={dncConfirmationModalVisible}
-            onClose={() => setDncConfirmationModalVisible(false)}
-            onConfirm={handleConfirmAddLeadToDNC}
-            message="Are you sure you want to add this lead to DNC? This action cannot be undone."
           />
         )}
 

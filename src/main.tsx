@@ -7,13 +7,11 @@ import {
 } from "react-router-dom";
 import { Login } from "./Pages/Login";
 import "./index.css";
-import { ForgetPassword } from "./Pages/ForgetPassword";
 import { Dashboard } from "./Pages/Dashboard";
 import { PanelLayout } from "./Components/PanelLayout";
 import { Leads } from "./Pages/Leads";
 import Assistant from "./Pages/Assistant";
 import GetNumbers from "./Pages/GetNumbers";
-import { Profile } from "./Pages/Profile";
 import { LoginChecker } from "./Components/LoginChecker";
 import { Files } from "./Pages/Files";
 import CreateAssitant from "./Pages/CreateAssistant";
@@ -27,36 +25,24 @@ import {
   isUserRole,
 } from "./Helpers/roleChecker";
 import { ViewDocuments } from "./Components/ViewDocuments";
-import BusinessSchedule from "./Pages/BusinessSchedule";
 // import { States } from "./Pages/States";
 import NotFoundPage from "./Components/NotFound";
-import Appointment from "./Pages/Appointement";
 import Appointments from "./Pages/Appointments";
 import ErrorBoundary from "./Components/ErrorBoundary";
-import CannotAccessPage from "./Components/CantAccess";
 import GhlLeads from "./Pages/GhlLeads";
 import Schedule from "./Pages/Schedule";
+import { ContentManagement } from "./Pages/ContentManagement";
+import { EventsAvailability } from "./Pages/EventsAvailability";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Navigate to="/login" />,
   },
-  {
-    path: 'can-not-access',
-    element: <ErrorBoundary><CannotAccessPage /></ErrorBoundary>
-  },
+
   {
     path: "*",
     element: <ErrorBoundary><NotFoundPage /></ErrorBoundary>
-  },
-  // {
-  //   path: "/appointment-schedulde",
-  //   element: <ErrorBoundary><AppointmentSuccess /></ErrorBoundary>,
-  // },
-  {
-    path: "/Appointment",
-    element: <ErrorBoundary><Appointment /></ErrorBoundary>,
   },
 
 
@@ -70,14 +56,6 @@ const router = createBrowserRouter([
   },
   
 
-  {
-    path: "/forget-password",
-    element: (
-      <LoginChecker allowedUser="not-logged-in">
-        <ErrorBoundary><ForgetPassword /></ErrorBoundary>
-      </LoginChecker>
-    ),
-  },
 
 
   {
@@ -148,6 +126,14 @@ const router = createBrowserRouter([
         element: <ErrorBoundary><ReportDashboard /></ErrorBoundary>,
       },
       {
+        path: "content-management",
+        element: <ErrorBoundary><ContentManagement /></ErrorBoundary>,
+      },
+      {
+        path: "events-availability",
+        element: <ErrorBoundary><EventsAvailability /></ErrorBoundary>,
+      },
+      {
         path: "call-logs",
         element: <ErrorBoundary><UsageReport /></ErrorBoundary>,
       },
@@ -159,16 +145,10 @@ const router = createBrowserRouter([
       //     },
       //   ]
       //   : []),
-      {
-        path: "business-schedule",
-        element: <ErrorBoundary><BusinessSchedule /></ErrorBoundary>,
-      },
 
 
-      {
-        path: "profile",
-        element: <ErrorBoundary><Profile /></ErrorBoundary>,
-      },
+
+
     ],
   },
 ]);

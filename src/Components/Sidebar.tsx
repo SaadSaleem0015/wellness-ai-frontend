@@ -6,6 +6,7 @@ import {
   // TbReportMoney,
   TbRobot,
   TbCalendar,
+  TbEdit,
 } from "react-icons/tb";
 import { FaFileAlt } from "react-icons/fa";
 import {
@@ -98,6 +99,14 @@ export function Sidebar({ sidebarCollapsed }: { sidebarCollapsed: boolean, setSi
 
         <SidebarItem to="/documents" icon={<FaFileAlt size={20} />}>
           Knowledge Base
+        </SidebarItem>
+
+        <SidebarItem to="/content-management" icon={<TbEdit size={20} />}>
+          Content Management
+        </SidebarItem>
+
+        <SidebarItem to="/events-availability" icon={<TbCalendar size={20} />}>
+          Events Availability
         </SidebarItem>
 
         <SidebarItem to="/call-logs" icon={<TbPhoneCalling size={20} />}>

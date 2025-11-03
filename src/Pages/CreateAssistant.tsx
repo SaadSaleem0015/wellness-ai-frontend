@@ -7,47 +7,21 @@ import { backendRequest } from "../Helpers/backendRequest";
 import { notifyResponse } from "../Helpers/notyf";
 import ForwardingPhoneNumber from "../Components/CreateAssistantTabs/ForwardingPhoneNumber";
 import { MdPhoneForwarded } from "react-icons/md";
-
-interface AssistantData {
-  id?: number;
-  name: string;
-  provider: string;
-  first_message: string;
-  model: string;
-  systemPrompt: string;
-  knowledgeBase: [];
-  temperature: number;
-  maxTokens: number;
-  transcribe_provider: string;
-  transcribe_language: string;
-  transcribe_model: string;
-  voice_provider: string;
-  voice: string;
-  voice_model:string;
-  forwardingPhoneNumber: string;
-  endCallPhrases: string[];
-  attached_Number: string | null;
-  draft: boolean;
-  assistant_toggle: boolean | null;
-  // success_evalution: string | null;
-}
+import { AssistantData } from "../Helpers/types";
 
 const CreateAssistant: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
     "Model" | "Voice" | "forwadingPhone"
   >("Model");
   const [loading, setLoading] = useState(false);
-  const [isSavingDraft, setIsSavingDraft] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState()
   const [isDataLoaded, setIsDataLoaded] = useState(false); 
 
- const [assistantData, setAssistantData] = useState({
+ const [assistantData, setAssistantData] = useState<AssistantData>({
   name: "New Assistant",
   provider: "openai",
   first_message: "Hello, this is Ava. How may I assist you today?",
   model: "gpt-4o-mini",
   systemPrompt: "I'm your virtual assistant. How can I help you today? I can provide information about our products, assist with placing orders, or help with any questions you may have. Just let me know what you're looking for!",
-  knowledgeBase: [],
   temperature: 0.5,
   maxTokens: 250,
   transcribe_provider: "deepgram",
@@ -60,16 +34,18 @@ const CreateAssistant: React.FC = () => {
   
   forwardingPhoneNumber: "",
   endCallPhrases: [],
-  attached_Number: null,
+  attached_Number: undefined,
   draft: false,
   assistant_toggle: null,
+  leadsfile: [],
+  tools: [],
 });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const assistantId = searchParams.get("id");
   const handleChange = (
     key: keyof AssistantData,
-    value: string | number | string[] | boolean
+    value: string | number | string[] | number[] | boolean
   ) => {
     setAssistantData((prev) => ({ ...prev, [key]: value }));
   };
@@ -83,9 +59,8 @@ const CreateAssistant: React.FC = () => {
             "GET",
             `/get-assistant/${assistantId}`
           );
-          if (response) {
-            setAssistantData(response);
-            setSelectedCategory(response.category)
+          if (response && 'name' in response) {
+            setAssistantData(response as AssistantData);
             setIsDataLoaded(true); 
           }
         } catch (error) {
@@ -111,7 +86,7 @@ const CreateAssistant: React.FC = () => {
         const response = await backendRequest(
           "PUT",
           `/update_assistant/${assistantId}`,
-          { ...assistantData, draft: draft, category: selectedCategory ? selectedCategory : "contacting_lead" }
+          { ...assistantData, draft: draft }
         );
         console.log("randasijdp:", response);
         if (response.success) {
@@ -137,7 +112,7 @@ const CreateAssistant: React.FC = () => {
         "Post",
         "/assistants",
         {
-          ...assistantData, draft: draft, category: selectedCategory ? selectedCategory : "contacting_lead"
+          ...assistantData, draft: draft
         }
       );
       console.log("respone:", response);
@@ -158,13 +133,7 @@ const CreateAssistant: React.FC = () => {
     }
   };
 
-  const handleDraftSave = () => {
-    setAssistantData((old) => ({ ...old, draft: true }));
-    setIsSavingDraft(true);
-    console.log("Before Submit the form request react state is ", assistantData.draft)
-    handleSubmit(true);
-    setIsSavingDraft(false);
-  };
+
 
   const handlePublish = () => {
     setLoading(true);
@@ -174,14 +143,8 @@ const CreateAssistant: React.FC = () => {
     setLoading(false);
   };
 
-  const UpdateDraft = () => {
-    setLoading(true);
-    setAssistantData((old) => ({ ...old, draft: true }));
-    handleUpdate(true)
-    setLoading(false);
-  }
 
-  const isButtonsDisabled = loading || isSavingDraft || (assistantId && !isDataLoaded);
+
 
   return (
     <div className=" text-sm md:text-md bg-white text-gray-900 p-4 pb-2 md:pt-4 md:px-8 ">
@@ -227,10 +190,8 @@ const CreateAssistant: React.FC = () => {
               <>
 
                 <button
-                  className={`px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-all ${isButtonsDisabled ? "opacity-80 cursor-not-allowed" : "hover:shadow-md"
-                    }`}
+                  className="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition-all hover:shadow-md"
                   onClick={assistantData.draft ? handlePublish : () => handleUpdate(false)}
-                  disabled={isButtonsDisabled}
                 >
                   {!isDataLoaded 
                     ? "Loading..." 
@@ -266,7 +227,7 @@ const CreateAssistant: React.FC = () => {
           <Model
             assistantData={assistantData}
             handleChange={handleChange}
-            setAssistantData={setAssistantData}
+            setAssistantData={(data: AssistantData) => setAssistantData(data)}
           />
         )}
         {activeTab === "Voice" && (

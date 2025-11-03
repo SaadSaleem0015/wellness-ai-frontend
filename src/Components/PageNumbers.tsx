@@ -2,6 +2,7 @@ import { TbChevronLeft, TbChevronRight, TbChevronsLeft, TbChevronsRight } from "
 
 export interface PageNumbersProps {
     currentPage: number,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     setCurrentPage: Function,
     pageNumbers: number[],
     pagesCount: number,

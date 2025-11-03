@@ -11,18 +11,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import ChatLoading from "../../Helpers/chatLoading";
-interface AssistantData {
-  name: string;
-  provider: string;
-  first_message: string;
-  model: string;
-  systemPrompt: string;
-  knowledgeBase: string[];
-  temperature: number;
-  maxTokens: number;
-  leadsfile: number[];
-  tools: string[];
-}
+import { AssistantData } from "../../Helpers/types";
 
 interface ModelProps {
   assistantData: AssistantData;
@@ -33,16 +22,7 @@ interface ModelProps {
   ) => void;
 }
 
-interface Document {
-  user_id: number;
-  id: number;
-  filename: string;
-  upload_date: string;
-  company_id: number;
-  original_filename: string;
-  vapi_id: string;
-  file_format: string;
-}
+
 
 
 interface Tool {
@@ -61,24 +41,13 @@ const Model: React.FC<ModelProps> = ({
   handleChange,
   setAssistantData,
 }) => {
-  const [documents, setDocuments] = useState<Document[]>([]);
   const [tools, setTools] = useState<Tool[]>([]);
   const [enhancedPrompt, setEnhancedPrompt] = useState("");
   const [showEnhancedModel, setShowEnhancedModel] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false)
 
-  const fetchDocuments = async () => {
-    try {
-      const response = await backendRequest<Document[], []>(
-        "GET",
-        "/knowledge-base-files"
-      );
-      setDocuments(response);
-    } catch (error) {
-      console.error("Fetch documents error:", error);
-    }
-  };
+
 
   const fetchTools = async () => {
     try {
@@ -92,30 +61,12 @@ const Model: React.FC<ModelProps> = ({
   };
 
   useEffect(() => {
-    fetchDocuments();
     fetchTools();
   }, []);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
 
-  const getDisplayFilename = (filename: string) => {
-    const parts = filename.split('_');
-    return parts.length > 1 ? parts.slice(1).join('_') : filename;
-  };
 
-  const documentOptions = documents.map((doc) => ({
-    value: doc.vapi_id,
-    label: `${getDisplayFilename(doc.filename)} - ${formatDate(doc.upload_date)}`,
-  }));
+
 
 
   const toolOptions = tools.map((tool) => ({
@@ -124,12 +75,6 @@ const Model: React.FC<ModelProps> = ({
   }));
 
 
-  const handleDocumentSelection = (
-    selectedOptions: MultiValue<{ value: string; label: string }>
-  ) => {
-    const selectedIds = selectedOptions.map((option) => option.value);
-    handleChange("knowledgeBase", selectedIds);
-  };
 
   const handleToolsSelection = (
     selectedOptions: MultiValue<{ value: string; label: string }>
@@ -188,7 +133,7 @@ const Model: React.FC<ModelProps> = ({
           This section allows you to configure the model for the assistant.
         </p>
         <hr className="bg-gray-200 pt-[.8px] mb-3" />
-        <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6 mb-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6 mb-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Assistant Name
@@ -201,7 +146,7 @@ const Model: React.FC<ModelProps> = ({
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
             />
           </div>
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Knowledge Base
             </label>
@@ -216,11 +161,8 @@ const Model: React.FC<ModelProps> = ({
               className="react-select-container"
               classNamePrefix="react-select"
             />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6 mb-3">
-          <div>
+          </div> */}
+            <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Tools
             </label>
@@ -236,9 +178,9 @@ const Model: React.FC<ModelProps> = ({
               classNamePrefix="react-select"
             />
           </div>
-          <div></div>
         </div>
 
+       
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:gap-6 mb-6">
           <div>
             <div className="flex justify-between">

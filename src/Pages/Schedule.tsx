@@ -22,6 +22,18 @@ interface ScheduleItem {
   scheduled_at: string; // ISO string
 }
 
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  detail?: string;
+}
+
+interface FileApiResponse {
+  success: boolean;
+  total: number;
+  data: LeadFile[];
+}
+
 export default function Schedule() {
   const [assistants, setAssistants] = useState<Assistant[]>([]);
   const [files, setFiles] = useState<LeadFile[]>([]);
@@ -41,37 +53,41 @@ export default function Schedule() {
 
   const fetchAssistants = async () => {
     try {
-      const res = await backendRequest<Assistant[] | { data: Assistant[] }>("GET", "/get-user-assistants");
-      const data = Array.isArray(res) ? res : (res as any)?.data || [];
+      const res = await backendRequest<Assistant[] | ApiResponse<Assistant[]>>("GET", "/get-user-assistants");
+      const data = Array.isArray(res) ? res : (res as ApiResponse<Assistant[]>)?.data || [];
       setAssistants(data);
       if (data.length > 0) setAssistantId(data[0].id);
-    } catch (e) {
+    } catch (error) {
+      console.error("Failed to fetch assistants:", error);
       setAssistants([]);
     }
   };
 
   const fetchFiles = async () => {
     try {
-      const res = await backendRequest<{ success: boolean; total: number; data: LeadFile[] }>("GET", "/leads-file");
-      if (res && (res as any).success) {
-        setFiles((res as any).data || []);
-        if ((res as any).data?.length > 0) setFileId((res as any).data[0].id);
+      const res = await backendRequest<FileApiResponse | LeadFile[]>("GET", "/leads-file");
+      if (res && 'success' in res && res.success) {
+        setFiles(res.data || []);
+        if (res.data?.length > 0) setFileId(res.data[0].id);
       } else if (Array.isArray(res)) {
-        setFiles(res as any);
+        setFiles(res);
+        if (res.length > 0) setFileId(res[0].id);
       } else {
         setFiles([]);
       }
-    } catch (e) {
+    } catch (error) {
+      console.error("Failed to fetch files:", error);
       setFiles([]);
     }
   };
 
   const fetchSchedules = async () => {
     try {
-      const res = await backendRequest<ScheduleItem[] | { data: ScheduleItem[] }>("GET", "/schedules");
-      const data = Array.isArray(res) ? res : (res as any)?.data || [];
+      const res = await backendRequest<ScheduleItem[] | ApiResponse<ScheduleItem[]>>("GET", "/schedules");
+      const data = Array.isArray(res) ? res : (res as ApiResponse<ScheduleItem[]>)?.data || [];
       setSchedules(data);
-    } catch (e) {
+    } catch (error) {
+      console.error("Failed to fetch schedules:", error);
       setSchedules([]);
     }
   };
@@ -91,29 +107,29 @@ export default function Schedule() {
 
   const handleCreate = async () => {
     if (!assistantId || !fileId || !date || !time) {
-      notifyResponse({ success: false, detail: "All fields are required" } as any);
+      notifyResponse({ success: false, detail: "All fields are required" } as ApiResponse<never>);
       return;
     }
     const scheduled_at = toIsoFromLocal(date, time);
     if (!scheduled_at) {
-      notifyResponse({ success: false, detail: "Invalid date/time" } as any);
+      notifyResponse({ success: false, detail: "Invalid date/time" } as ApiResponse<never>);
       return;
     }
     setLoading(true);
     try {
-      const res = await backendRequest("POST", "/schedule", {
+      const res = await backendRequest<ApiResponse<never>>("POST", "/schedule", {
         assistant_id: assistantId,
         file_id: fileId,
         scheduled_at,
       });
       notifyResponse(res);
-      if ((res as any).success) {
+      if (res.success) {
         await fetchSchedules();
         setDate("");
         setTime("");
       }
-    } catch (e) {
-      // noop handled by notifyResponse if backend returns
+    } catch (error) {
+      console.error("Failed to create schedule:", error);
     } finally {
       setLoading(false);
     }
@@ -127,11 +143,13 @@ export default function Schedule() {
   const deleteSchedule = async () => {
     if (scheduleToDelete == null) return;
     try {
-      const res = await backendRequest("DELETE", `/schedule/${scheduleToDelete}`);
+      const res = await backendRequest<ApiResponse<never>>("DELETE", `/schedule/${scheduleToDelete}`);
       notifyResponse(res);
-      if ((res as any).success) {
+      if (res.success) {
         setSchedules((prev) => prev.filter((s) => s.id !== scheduleToDelete));
       }
+    } catch (error) {
+      console.error("Failed to delete schedule:", error);
     } finally {
       setShowModal(false);
       setScheduleToDelete(null);
@@ -179,11 +197,11 @@ export default function Schedule() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Assistant</label>
             <select
               className="w-full p-2 border rounded"
-              value={assistantId as any}
+              value={assistantId}
               onChange={(e) => setAssistantId(e.target.value)}
             >
               {assistants.map((a) => (
-                <option key={a.id} value={a.id as any}>{a.name}</option>
+                <option key={a.id} value={a.id}>{a.name}</option>
               ))}
             </select>
           </div>
@@ -191,7 +209,7 @@ export default function Schedule() {
             <label className="block text-sm font-medium text-gray-700 mb-2">Lead File</label>
             <select
               className="w-full p-2 border rounded"
-              value={fileId as any}
+              value={fileId}
               onChange={(e) => setFileId(Number(e.target.value))}
             >
               {files.map((f) => (

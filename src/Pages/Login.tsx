@@ -1,7 +1,6 @@
 import { useState, FormEvent } from "react";
 import { Input } from "../Components/Input";
 import { backendRequest } from "../Helpers/backendRequest";
-import { Anchor } from "../Components/Anchor";
 import { useNavigate } from "react-router-dom";
 import { notifyResponse } from "../Helpers/notyf";
 import { Checkbox } from "../Components/Checkbox";
@@ -153,12 +152,7 @@ export function Login() {
                     Keep me logged in
                   </label>
                 </div>
-                <Anchor
-                  to="/forget-password"
-                  className="text-xs text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                >
-                  Forgot password?
-                </Anchor>
+              
               </div>
 
               <button

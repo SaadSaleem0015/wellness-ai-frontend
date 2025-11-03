@@ -76,6 +76,7 @@ const UsageReport: React.FC = () => {
   const [search, setSearch] = useState("")
   const [dispositionFilter, setDispositionFilter] = useState("")
   const [loading, setLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
   const [showPhoneNumberModal, setShowPhoneNumberModal] = useState<boolean>(false)
   const [phoneNumberDetails, setPhoneNumberDetails] = useState<CallLog[] | null>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -138,14 +139,17 @@ const UsageReport: React.FC = () => {
     setCurrentPage(1)
   }, [search, dispositionFilter, itemsPerPage])
 
+
+
   useEffect(() => {
     const fetchCallLogs = async () => {
+      setInitialLoading(true)
       try {
-        const logs = await backendRequest<CallLog[], []>("GET", "/user/call-logs-detail")
+        const logs = await backendRequest<CallLog[], []>("GET", "/calls-logs")
         if (Array.isArray(logs)) {
           const sortedLogs = logs.sort((a, b) => {
-            const dateA = new Date(a.call_started_at)
-            const dateB = new Date(b.call_started_at)
+            const dateA = new Date(a.call_started_at || '')
+            const dateB = new Date(b.call_started_at || '')
             return dateB.getTime() - dateA.getTime()
           })
           setCallLogs(sortedLogs)
@@ -156,6 +160,8 @@ const UsageReport: React.FC = () => {
         }
       } catch (error) {
         console.error("Failed to fetch call logs:", error)
+      } finally {
+        setInitialLoading(false)
       }
     }
 
@@ -243,13 +249,18 @@ const formatTime = (time: number) => {
 
   return (
     <div className="relative">
-      {loading && (
+      {(loading || initialLoading) && (
         <div className="fixed inset-0 bg-gray-700 bg-opacity-50 z-50 flex items-center justify-center">
-          <Loading />
+          <div className="bg-white rounded-lg p-6 shadow-lg flex flex-col items-center">
+            <Loading />
+            <p className="mt-12 text-gray-600 text-sm">
+              {initialLoading ? "Loading call logs..." : "Processing..."}
+            </p>
+          </div>
         </div>
       )}
       <div className="bg-white text-gray-900 p-4 md:p-8">
-        <h1 className="text-xl md:text-3xl font-bold mb-4">Usage Report </h1>
+        <h1 className="text-xl md:text-3xl font-bold mb-4">Call logs </h1>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full">
             {/* Search Input */}

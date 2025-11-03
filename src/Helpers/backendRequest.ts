@@ -88,9 +88,10 @@ export async function* backendStreamingRequest(
                 if (errorData.detail) {
                     errorMessage = errorData.detail;
                 }
-            } catch (parseError) {
+            } catch (parseError: unknown) {
                
                 errorMessage = await response.text();
+                console.error(parseError);
             }
 
             throw new Error(errorMessage);

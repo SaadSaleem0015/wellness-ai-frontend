@@ -18,44 +18,33 @@ interface PurchasedNumber {
   user_id: number;
 }
 
-interface Assistant {
-  id: string;
-  name: string;
-  attached_Number: string | null;
-}
+
 
 const PurchasedNumbers: React.FC = () => {
   const [search, setSearch] = useState('');
   const [purchasedNumbers, setPurchasedNumbers] = useState<PurchasedNumber[]>([]);
-  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [assistants, setAssistants] = useState<Assistant[]>([]);
   const [returnNumber, setReturnNumber] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [numberDeleteModel, setNumberDeleteModel] = useState<boolean>(false);
   const itemsPerPage = 10;
 
   useEffect(() => {
     fetchPurchasedNumbers();
-    fetchAssistants();
   }, []);
 
   const fetchPurchasedNumbers = async () => {
     try {
+      setLoading(true);
       const response = await backendRequest<PurchasedNumber[]>('GET', '/purchased_numbers');
+      setLoading(false);
       setPurchasedNumbers(Array.isArray(response) ? response : []);
     } catch (error) {
       console.error('Error fetching purchased numbers:', error);
     }
   };
 
-  const fetchAssistants = async () => {
-    try {
-      const response = await backendRequest<Assistant[]>('GET', '/get-user-assistants');
-      setAssistants(Array.isArray(response) ? response : []);
-    } catch (error) {
-      console.error('Error fetching assistants:', error);
-    }
-  };
+
 
   const filteredNumbers = purchasedNumbers.filter(
     (num) =>

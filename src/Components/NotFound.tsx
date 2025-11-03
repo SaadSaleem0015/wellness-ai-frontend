@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { FaHome, FaSearch, FaExclamationTriangle } from "react-icons/fa";
+import { FaExclamationTriangle } from "react-icons/fa";
 
 const NotFoundPage = () => {
   const navigate = useNavigate();

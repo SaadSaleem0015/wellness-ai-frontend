@@ -1,5 +1,4 @@
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
-import { TbTrash } from "react-icons/tb";
 import { FaEye, FaSearch } from "react-icons/fa";
 import AudioPlayer from "react-modern-audio-player";
 import { Dialog } from "@headlessui/react";
@@ -58,6 +57,7 @@ const CallLogs: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("")
   const [ loading , setLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
 
 
   const { filteredItems: filteredCallLogs, pagesCount, pageNumbers } = useMemo(
@@ -66,6 +66,7 @@ const CallLogs: React.FC = () => {
   )
   useEffect(() => {
     const fetchCallLogs = async () => {
+      setInitialLoading(true)
       try {
         const logs = await backendRequest<CallLog[], []>("GET", "/user/call-logs-detail");
   
@@ -83,6 +84,8 @@ const CallLogs: React.FC = () => {
         }
       } catch (error) {
         console.error("Failed to fetch call logs:", error);
+      } finally {
+        setInitialLoading(false)
       }
     };
   
@@ -124,10 +127,7 @@ const CallLogs: React.FC = () => {
     }
   };
 
-  const handleShowDeleteModal = (id: string) => {
-    setSelectedLogId(id);
-    setShowDeleteModal(true);
-  };
+
 
   const handleLeadDetail = async (leadId: number) => {
     try {
@@ -167,9 +167,14 @@ const CallLogs: React.FC = () => {
   return (
     <div className="relative">
 
-    {loading && (
+    {(loading || initialLoading) && (
       <div className="fixed inset-0 bg-gray-700 bg-opacity-50 z-50 flex items-center justify-center">
-        <Loading />
+        <div className="bg-white rounded-lg p-6 shadow-lg flex flex-col items-center">
+          <Loading />
+          <p className="mt-4 text-gray-600 text-sm">
+            {initialLoading ? "Loading call logs..." : "Processing..."}
+          </p>
+        </div>
       </div>
     )}
     <div className="bg-white text-gray-900 p-4 md:p-8">

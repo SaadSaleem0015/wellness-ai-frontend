@@ -13,7 +13,6 @@ interface Agent extends Record<string, unknown> {
   add_voice_id_manually: boolean;
   first_message: string;
   id: number;
-  knowledgeBase: number;
   leadsfile: number;
   maxTokens: number;
   model: string;
