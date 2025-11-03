@@ -36,6 +36,7 @@ import ErrorBoundary from "./Components/ErrorBoundary";
 import CannotAccessPage from "./Components/CantAccess";
 import GhlLeads from "./Pages/GhlLeads";
 import Schedule from "./Pages/Schedule";
+import ChatList from "./Pages/MessageChat";
 
 const router = createBrowserRouter([
   {
@@ -136,6 +137,10 @@ const router = createBrowserRouter([
         element: <ErrorBoundary><Assistant /></ErrorBoundary>,
       },
       {
+        path: "message-chat",
+        element: <ErrorBoundary><ChatList /></ErrorBoundary>,
+      },
+      {
         path: "appointments",
         element: <ErrorBoundary><Appointments /></ErrorBoundary>,
       },
@@ -151,14 +156,6 @@ const router = createBrowserRouter([
         path: "call-logs",
         element: <ErrorBoundary><UsageReport /></ErrorBoundary>,
       },
-      // ...(!isUserRole()
-      //   ? [
-      //     {
-      //       path: "billing-report",
-      //       element: <ErrorBoundary><BillingReport /></ErrorBoundary>,
-      //     },
-      //   ]
-      //   : []),
       {
         path: "business-schedule",
         element: <ErrorBoundary><BusinessSchedule /></ErrorBoundary>,
