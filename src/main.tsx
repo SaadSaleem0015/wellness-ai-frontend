@@ -33,6 +33,7 @@ import GhlLeads from "./Pages/GhlLeads";
 import Schedule from "./Pages/Schedule";
 import { ContentManagement } from "./Pages/ContentManagement";
 import { EventsAvailability } from "./Pages/EventsAvailability";
+import ChatList from "./Pages/MessageChat";
 
 const router = createBrowserRouter([
   {
@@ -114,6 +115,10 @@ const router = createBrowserRouter([
         element: <ErrorBoundary><Assistant /></ErrorBoundary>,
       },
       {
+        path: "message-chat",
+        element: <ErrorBoundary><ChatList /></ErrorBoundary>,
+      },
+      {
         path: "appointments",
         element: <ErrorBoundary><Appointments /></ErrorBoundary>,
       },
@@ -145,6 +150,10 @@ const router = createBrowserRouter([
       //     },
       //   ]
       //   : []),
+      // {
+      //   path: "business-schedule",
+      //   element: <ErrorBoundary><BusinessSchedule /></ErrorBoundary>,
+      // },
 
 
 

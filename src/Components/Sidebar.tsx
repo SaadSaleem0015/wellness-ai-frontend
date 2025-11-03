@@ -11,6 +11,7 @@ import {
 import { FaFileAlt } from "react-icons/fa";
 import {
   MdCall,
+  MdOutlineMessage,
 } from "react-icons/md";
 // import { BiDollar } from "react-icons/bi";
 import { LuFileBadge } from "react-icons/lu";
@@ -75,6 +76,9 @@ export function Sidebar({ sidebarCollapsed }: { sidebarCollapsed: boolean, setSi
 
         <SidebarItem to="/assistant" icon={<TbRobot size={20} />}>
           Assistant
+        </SidebarItem>
+        <SidebarItem to="/message-chat" icon={<MdOutlineMessage size={20} />}>
+          Message History
         </SidebarItem>
 
         <SidebarItem to="/appointments" icon={<TbCalendar size={20} />}>
