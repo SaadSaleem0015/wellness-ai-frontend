@@ -31,7 +31,7 @@ import Appointments from "./Pages/Appointments";
 import ErrorBoundary from "./Components/ErrorBoundary";
 import GhlLeads from "./Pages/GhlLeads";
 import Schedule from "./Pages/Schedule";
-import { ContentManagement } from "./Pages/ContentManagement";
+// import { ContentManagement } from "./Pages/ContentManagement";
 import { EventsAvailability } from "./Pages/EventsAvailability";
 import ChatList from "./Pages/MessageChat";
 
@@ -130,10 +130,10 @@ const router = createBrowserRouter([
         path: "report-dashboard",
         element: <ErrorBoundary><ReportDashboard /></ErrorBoundary>,
       },
-      {
-        path: "content-management",
-        element: <ErrorBoundary><ContentManagement /></ErrorBoundary>,
-      },
+      // {
+      //   path: "content-management",
+      //   element: <ErrorBoundary><ContentManagement /></ErrorBoundary>,
+      // },
       {
         path: "events-availability",
         element: <ErrorBoundary><EventsAvailability /></ErrorBoundary>,
