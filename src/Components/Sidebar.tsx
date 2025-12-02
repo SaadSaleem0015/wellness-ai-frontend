@@ -105,9 +105,9 @@ export function Sidebar({ sidebarCollapsed }: { sidebarCollapsed: boolean, setSi
           Knowledge Base
         </SidebarItem>
 
-        <SidebarItem to="/content-management" icon={<TbEdit size={20} />}>
+        {/* <SidebarItem to="/content-management" icon={<TbEdit size={20} />}>
           Content Management
-        </SidebarItem>
+        </SidebarItem> */}
 
         <SidebarItem to="/events-availability" icon={<TbCalendar size={20} />}>
           Events Availability
