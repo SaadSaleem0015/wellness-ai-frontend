@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { FaEye, FaTrash, FaSpinner, FaTimes, FaExclamationTriangle } from 'react-icons/fa';
+import { FaEye, FaTrash, FaSpinner, FaTimes, FaExclamationTriangle, FaCog } from 'react-icons/fa';
 import ChatDetail from '../Components/ChatDetail';
 import { backendRequest } from '../Helpers/backendRequest';
 import { filterAndPaginate } from '../Helpers/filterAndPaginate';
 import { PageNumbers } from '../Components/PageNumbers';
+import ChatSettings from '../Components/ChatSetting';
 
 interface Chat extends Record<string, unknown> {
   phone_number: string;
@@ -14,7 +15,7 @@ interface Chat extends Record<string, unknown> {
 }
 
 const ChatList = () => {
-  const [currentView, setCurrentView] = useState<'list' | 'detail'>('list');
+  const [currentView, setCurrentView] = useState<'list' | 'detail' | 'settings'>('list');
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState<string>('');
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -24,11 +25,13 @@ const ChatList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [phoneNumberToDelete, setPhoneNumberToDelete] = useState<string>('');
 
-  // Fetch chats from API
+  // Fetch chats from API with polling
   useEffect(() => {
-    const fetchChats = async () => {
+    const fetchChats = async (showLoading: boolean = false) => {
       try {
-        setLoading(true);
+        if (showLoading) {
+          setLoading(true);
+        }
         const messageList = await backendRequest<Chat[]>("GET", "/chats");
         
         // Check if the response has success property (error response)
@@ -50,16 +53,33 @@ const ChatList = () => {
         setError('Failed to load chats');
         console.error('Error fetching chats:', err);
       } finally {
-        setLoading(false);
+        if (showLoading) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchChats();
+    // Initial fetch with loading
+    fetchChats(true);
+
+    // Set up polling every 30 seconds without loading
+    const intervalId = setInterval(() => {
+      fetchChats(false);
+    }, 30000);
+
+    // Cleanup interval on unmount
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
 
   const handleViewChat = (phoneNumber: string) => {
     setSelectedPhoneNumber(phoneNumber);
     setCurrentView('detail');
+  };
+
+  const handleSettingsClick = () => {
+    setCurrentView('settings');
   };
 
   const handleDeleteClick = (phoneNumber: string) => {
@@ -149,6 +169,15 @@ const ChatList = () => {
     );
   }
 
+  // If we're in settings view, show ChatSettings component
+  if (currentView === 'settings') {
+    return (
+      <ChatSettings
+        onBack={handleBackToList}
+      />
+    );
+  }
+
   // Loading state
   if (loading) {
     return (
@@ -186,8 +215,19 @@ const ChatList = () => {
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Header */}
           <div className="bg-primary px-6 py-4">
-            <h1 className="text-2xl font-bold text-white">Chat Conversations</h1>
-            <p className="text-white mt-1">Manage and view all customer conversations</p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl font-bold text-white">Chat Conversations</h1>
+                <p className="text-white mt-1">Manage and view all customer conversations</p>
+              </div>
+              <button
+                onClick={handleSettingsClick}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary bg-white hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+              >
+                <FaCog className="mr-2" />
+                Chat Assistant Settings
+              </button>
+            </div>
           </div>
 
           {/* Search Bar */}
