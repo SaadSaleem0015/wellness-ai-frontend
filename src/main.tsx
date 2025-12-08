@@ -34,6 +34,7 @@ import Schedule from "./Pages/Schedule";
 // import { ContentManagement } from "./Pages/ContentManagement";
 import { EventsAvailability } from "./Pages/EventsAvailability";
 import ChatList from "./Pages/MessageChat";
+import { ContentManagement } from "./Pages/ContentManagement";
 
 const router = createBrowserRouter([
   {
@@ -130,10 +131,10 @@ const router = createBrowserRouter([
         path: "report-dashboard",
         element: <ErrorBoundary><ReportDashboard /></ErrorBoundary>,
       },
-      // {
-      //   path: "content-management",
-      //   element: <ErrorBoundary><ContentManagement /></ErrorBoundary>,
-      // },
+      {
+        path: "content-management",
+        element: <ErrorBoundary><ContentManagement /></ErrorBoundary>,
+      },
       {
         path: "events-availability",
         element: <ErrorBoundary><EventsAvailability /></ErrorBoundary>,

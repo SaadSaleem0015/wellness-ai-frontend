@@ -163,22 +163,6 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Activity</h3>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm text-gray-600">New leads processed</span>
-              <span className="text-xs text-gray-500 ml-auto">2 min ago</span>
-            </div>
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="text-sm text-gray-600">Knowledge base updated</span>
-              <span className="text-xs text-gray-500 ml-auto">1 hour ago</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
